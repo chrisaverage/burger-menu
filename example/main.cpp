@@ -17,7 +17,6 @@ int main(int argc, char *argv[])
     QTextEdit*  textEdit = new QTextEdit();
 
     window.setLayout(new QHBoxLayout());
-    window.layout()->addWidget(menu);
     window.layout()->setContentsMargins(0,0,0,0);
     window.layout()->setSpacing(0);
     window.layout()->addWidget(menu);

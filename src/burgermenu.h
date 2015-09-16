@@ -36,7 +36,7 @@ public slots:
     QAction* addMenuAction(const QIcon& icon, const QString& label);
     void     removeMenuAction(QAction* action);
 
-    void setBurgerIcon(QIcon& icon);
+    void setBurgerIcon(const QIcon& icon);
     void setIconSize(const QSize& size);
     void setMenuWidth(int width);
     void setAnimated(bool animated);

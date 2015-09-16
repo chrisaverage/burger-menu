@@ -149,7 +149,7 @@ void BurgerMenu::removeMenuAction(QAction* action)
     unRegisterAction(action);
 }
 
-void BurgerMenu::setBurgerIcon(QIcon& icon)
+void BurgerMenu::setBurgerIcon(const QIcon& icon)
 {
     mBurgerButton->setIcon(icon);
 }

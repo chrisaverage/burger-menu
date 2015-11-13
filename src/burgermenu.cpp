@@ -152,6 +152,7 @@ void BurgerMenu::removeMenuAction(QAction* action)
 void BurgerMenu::setBurgerIcon(const QIcon& icon)
 {
     mBurgerButton->setIcon(icon);
+    emit iconChanged();
 }
 
 void BurgerMenu::setIconSize(const QSize& size)

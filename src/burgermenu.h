@@ -2,6 +2,7 @@
 #include <QWidget>
 #include <QList>
 #include <QSize>
+#include <QIcon>
 
 class QPushButton;
 class QActionGroup;
@@ -11,9 +12,10 @@ class QString;
 class BurgerMenu : public QWidget
 {
     Q_OBJECT
-    Q_PROPERTY(QSize iconSize  READ iconSize  WRITE setIconSize  NOTIFY iconSizeChanged)
-    Q_PROPERTY(int   menuWidth READ menuWidth WRITE setMenuWidth NOTIFY menuWidthChanged)
-    Q_PROPERTY(bool  animated  READ animated  WRITE setAnimated  NOTIFY animatedChanged)
+    Q_PROPERTY(QIcon icon      READ burgerIcon WRITE setBurgerIcon NOTIFY iconChanged)
+    Q_PROPERTY(QSize iconSize  READ iconSize   WRITE setIconSize   NOTIFY iconSizeChanged)
+    Q_PROPERTY(int   menuWidth READ menuWidth  WRITE setMenuWidth  NOTIFY menuWidthChanged)
+    Q_PROPERTY(bool  animated  READ animated   WRITE setAnimated   NOTIFY animatedChanged)
 
 public:
     BurgerMenu(QWidget* parent = nullptr);
@@ -25,6 +27,7 @@ public:
     bool animated() const;
 
 signals:
+    void iconChanged() const;
     void iconSizeChanged(const QSize& size) const;
     void menuWidthChanged(int width) const;
     void animatedChanged(bool animated) const;

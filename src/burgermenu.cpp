@@ -72,7 +72,6 @@ BurgerMenu::BurgerMenu(QWidget* parent)
     , mBurgerButton(new QPushButton(this))
     , mMenuWidth(200)
     , mAnimated(true)
-    , mExpanded(false)
 {
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
     mBurgerButton->setObjectName(MainBurgerButtonObjectName);
@@ -100,7 +99,8 @@ BurgerMenu::BurgerMenu(QWidget* parent)
     lay->addStretch();
     setFixedWidth(48);
 
-    connect(mBurgerButton, &QPushButton::toggled, this, &BurgerMenu::setExpanded);
+    connect(mBurgerButton, &QPushButton::toggled, this, &BurgerMenu::setExpansionState);
+    connect(mBurgerButton, &QPushButton::toggled, this, &BurgerMenu::expandedChanged);
     connect(mActions, &QActionGroup::triggered, this, &BurgerMenu::triggered);
 }
 
@@ -193,13 +193,8 @@ void BurgerMenu::setMenuWidth(int width)
     emit menuWidthChanged(mMenuWidth);
 }
 
-void BurgerMenu::setExpanded(bool expanded)
+void BurgerMenu::setExpansionState(bool expanded)
 {
-    if(mExpanded == expanded)
-        return;
-
-    mExpanded = expanded;
-
     if(mAnimated)
     {
         auto anim = new QPropertyAnimation(this, "minimumWidth", this);
@@ -217,8 +212,6 @@ void BurgerMenu::setExpanded(bool expanded)
         else
             setFixedWidth(mBurgerButton->iconSize().width());
     }
-
-    emit expandedChanged(mExpanded);
 }
 
 void BurgerMenu::registerAction(QAction* action)
@@ -244,7 +237,7 @@ bool BurgerMenu::animated() const
 
 bool BurgerMenu::expanded() const
 {
-    return mExpanded;
+    return mBurgerButton->isChecked();
 }
 
 void BurgerMenu::setAnimated(bool animated)
@@ -254,6 +247,11 @@ void BurgerMenu::setAnimated(bool animated)
 
     mAnimated = animated;
     emit animatedChanged(mAnimated);
+}
+
+void BurgerMenu::setExpanded(bool expanded)
+{
+    mBurgerButton->setChecked(expanded);
 }
 
 void BurgerMenu::paintEvent(QPaintEvent*)

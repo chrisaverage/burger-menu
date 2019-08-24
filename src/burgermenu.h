@@ -54,10 +54,10 @@ protected:
 private:
     void registerAction(QAction* action);
     void unRegisterAction(QAction* action);
+    void setExpansionState(bool expanded);
 
     QActionGroup* mActions;
     QPushButton*  mBurgerButton;
     int           mMenuWidth;
     bool          mAnimated;
-    bool          mExpanded;
 };

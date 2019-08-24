@@ -16,6 +16,7 @@ class BurgerMenu : public QWidget
     Q_PROPERTY(QSize iconSize  READ iconSize   WRITE setIconSize   NOTIFY iconSizeChanged)
     Q_PROPERTY(int   menuWidth READ menuWidth  WRITE setMenuWidth  NOTIFY menuWidthChanged)
     Q_PROPERTY(bool  animated  READ animated   WRITE setAnimated   NOTIFY animatedChanged)
+    Q_PROPERTY(bool  expanded  READ expanded   WRITE setExpanded   NOTIFY expandedChanged)
 
 public:
     BurgerMenu(QWidget* parent = nullptr);
@@ -25,12 +26,14 @@ public:
     int menuWidth() const;
     QList<QAction*>	actions() const;
     bool animated() const;
+    bool expanded() const;
 
 signals:
     void iconChanged() const;
     void iconSizeChanged(const QSize& size) const;
     void menuWidthChanged(int width) const;
     void animatedChanged(bool animated) const;
+    void expandedChanged(bool expanded) const;
     void triggered(QAction* action) const;
 
 public slots:
@@ -43,12 +46,12 @@ public slots:
     void setIconSize(const QSize& size);
     void setMenuWidth(int width);
     void setAnimated(bool animated);
+    void setExpanded(bool expanded);
 
 protected:
     void paintEvent(QPaintEvent*) override;
 
 private:
-    void toggle(bool checked);
     void registerAction(QAction* action);
     void unRegisterAction(QAction* action);
 
@@ -56,4 +59,5 @@ private:
     QPushButton*  mBurgerButton;
     int           mMenuWidth;
     bool          mAnimated;
+    bool          mExpanded;
 };

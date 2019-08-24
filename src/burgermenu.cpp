@@ -16,7 +16,10 @@ static const QString MainBurgerButtonObjectName("MainBurgerButton");
 class BurgerButton : public QPushButton
 {
 public:
-    BurgerButton(QAction* action, QWidget* parent) : QPushButton(parent), mAction(action), mIconSize(QSize(64,64))
+    BurgerButton(QAction* action, QWidget* parent)
+        : QPushButton(parent)
+        , mIconSize(QSize(64,64))
+        , mAction(action)
     {
         setObjectName(BurgerButtonObjectName);
         connect(action, &QAction::destroyed, this, &BurgerButton::deleteLater);
@@ -64,11 +67,12 @@ private:
 
 
 BurgerMenu::BurgerMenu(QWidget* parent)
-    : QWidget(parent),
-      mActions(new QActionGroup(this)),
-      mBurgerButton(new QPushButton(this)),
-      mMenuWidth(200),
-      mAnimated(true)
+    : QWidget(parent)
+    , mActions(new QActionGroup(this))
+    , mBurgerButton(new QPushButton(this))
+    , mMenuWidth(200)
+    , mAnimated(true)
+    , mExpanded(false)
 {
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
     mBurgerButton->setObjectName(MainBurgerButtonObjectName);
@@ -96,7 +100,7 @@ BurgerMenu::BurgerMenu(QWidget* parent)
     lay->addStretch();
     setFixedWidth(48);
 
-    connect(mBurgerButton, &QPushButton::toggled, this, &BurgerMenu::toggle);
+    connect(mBurgerButton, &QPushButton::toggled, this, &BurgerMenu::setExpanded);
     connect(mActions, &QActionGroup::triggered, this, &BurgerMenu::triggered);
 }
 
@@ -189,25 +193,32 @@ void BurgerMenu::setMenuWidth(int width)
     emit menuWidthChanged(mMenuWidth);
 }
 
-void BurgerMenu::toggle(bool checked)
+void BurgerMenu::setExpanded(bool expanded)
 {
+    if(mExpanded == expanded)
+        return;
+
+    mExpanded = expanded;
+
     if(mAnimated)
     {
         auto anim = new QPropertyAnimation(this, "minimumWidth", this);
         anim->setDuration(250);
         anim->setStartValue(mBurgerButton->iconSize().width());
         anim->setEndValue(mBurgerButton->iconSize().width() + mMenuWidth);
-        anim->setDirection(checked ? QAbstractAnimation::Forward : QAbstractAnimation::Backward);
-        anim->setEasingCurve(checked ? QEasingCurve::OutCubic : QEasingCurve::InCubic);
+        anim->setDirection(expanded ? QAbstractAnimation::Forward : QAbstractAnimation::Backward);
+        anim->setEasingCurve(expanded ? QEasingCurve::OutCubic : QEasingCurve::InCubic);
         anim->start(QAbstractAnimation::DeleteWhenStopped);
     }
     else
     {
-        if(checked)
+        if(expanded)
             setFixedWidth(mBurgerButton->iconSize().width() + mMenuWidth);
         else
             setFixedWidth(mBurgerButton->iconSize().width());
     }
+
+    emit expandedChanged(mExpanded);
 }
 
 void BurgerMenu::registerAction(QAction* action)
@@ -229,6 +240,11 @@ void BurgerMenu::unRegisterAction(QAction* action)
 bool BurgerMenu::animated() const
 {
     return mAnimated;
+}
+
+bool BurgerMenu::expanded() const
+{
+    return mExpanded;
 }
 
 void BurgerMenu::setAnimated(bool animated)

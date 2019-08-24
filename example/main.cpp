@@ -43,6 +43,11 @@ int main(int argc, char *argv[])
         textEdit->setText(QString("Action \"%1\" clicked.").arg(action->iconText()));
     });
 
+    QObject::connect(menu, &BurgerMenu::expandedChanged, [&](bool expanded)
+    {
+        textEdit->setText(QString("Expanded changed: %1").arg(expanded ? "expanded" : "collapsed"));
+    });
+
     window.show();
     return a.exec();
 }

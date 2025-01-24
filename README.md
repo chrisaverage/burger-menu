@@ -10,7 +10,7 @@ Theme is configurable via standard stylesheet box model referring to object name
 - *#BurgerButton* - a single entry on the list
 - *#MainBurgerButton* - the burget menu button
 
-An opional Qt Designer plugin is provided to ease integrating this widget with .ui classes, but due to restrictions of designer API actions need to be added from code.
+An optional Qt Designer plugin is provided to ease integrating this widget with .ui classes, but due to restrictions of designer API actions need to be added from code.
 
 Example look:
 

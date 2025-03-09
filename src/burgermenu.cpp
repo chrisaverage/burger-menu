@@ -8,6 +8,7 @@
 #include <QStyleOption>
 #include <QPainter>
 #include <QPropertyAnimation>
+#include <QActionGroup>
 
 static const QString BurgerButtonObjectName("BurgerButton");
 static const QString BurgerMenuName("BurgerMenu");

@@ -16,6 +16,8 @@ static const QString MainBurgerButtonObjectName("MainBurgerButton");
 
 class BurgerButton : public QPushButton
 {
+    Q_OBJECT
+
 public:
     BurgerButton(QAction* action, QWidget* parent)
         : QPushButton(parent)
@@ -168,7 +170,7 @@ void BurgerMenu::setIconSize(const QSize& size)
 
     mBurgerButton->setIconSize(size);
     mBurgerButton->setFixedSize(size);
-    auto buttons = findChildren<BurgerButton*>(BurgerButtonObjectName);
+    auto buttons = findChildren<BurgerButton*>(NULL);
     for(auto btn : buttons)
         btn->setIconSize(size);
 

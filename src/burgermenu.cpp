@@ -1,17 +1,18 @@
 #include "burgermenu.h"
-#include <QStackedWidget>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QPushButton>
-#include <QAction>
-#include <QString>
-#include <QStyleOption>
+
+#include <QActionGroup>
+#include <QBoxLayout>
 #include <QPainter>
 #include <QPropertyAnimation>
+#include <QPushButton>
+#include <QStyleOption>
 
-static const QString BurgerButtonObjectName("BurgerButton");
-static const QString BurgerMenuName("BurgerMenu");
-static const QString MainBurgerButtonObjectName("MainBurgerButton");
+namespace ObjectNames
+{
+    static const QLatin1String BurgerButton ("BurgerButton");
+    static const QLatin1String BurgerMenu ("BurgerMenu");
+    static const QLatin1String MainBurgerButton ("MainBurgerButton");
+}
 
 class BurgerButton : public QPushButton
 {
@@ -21,12 +22,12 @@ public:
         , mIconSize(QSize(64,64))
         , mAction(action)
     {
-        setObjectName(BurgerButtonObjectName);
         connect(action, &QAction::destroyed, this, &BurgerButton::deleteLater);
         setCursor(Qt::PointingHandCursor);
 
-        connect(mAction, SIGNAL(changed()), this, SLOT(update()));
-        connect(this, &BurgerButton::clicked, [&]{
+        connect(mAction, &QAction::changed, this, static_cast<void(BurgerButton::*)()>(&BurgerButton::update));
+        connect(this, &BurgerButton::clicked, mAction, [&]
+        {
             if(mAction->isCheckable() && !mAction->isChecked())
                 mAction->toggle();
 
@@ -57,15 +58,22 @@ public:
         style()->drawControl(QStyle::CE_CheckBoxLabel, &opt, &painter, this);
     }
 
-    void setIconSize(const QSize& size) { mIconSize = size; setFixedHeight(mIconSize.height()); update(); }
+    void setIconSize(const QSize& size)
+    {
+        mIconSize = size;
+        setFixedHeight(mIconSize.height());
+        update();
+    }
 
-    QAction* action() const { return mAction; }
+    QAction* action() const
+    {
+        return mAction;
+    }
 
 private:
     QSize mIconSize;
     QAction* mAction;
 };
-
 
 BurgerMenu::BurgerMenu(QWidget* parent)
     : QWidget(parent)
@@ -75,7 +83,7 @@ BurgerMenu::BurgerMenu(QWidget* parent)
     , mAnimated(true)
 {
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-    mBurgerButton->setObjectName(MainBurgerButtonObjectName);
+    mBurgerButton->setObjectName(ObjectNames::MainBurgerButton);
     mBurgerButton->setFlat(true);
     mBurgerButton->setIconSize(QSize(48,48));
     mBurgerButton->setFixedSize(48,48);
@@ -84,7 +92,7 @@ BurgerMenu::BurgerMenu(QWidget* parent)
     mActions->setExclusive(true);
 
     auto burgerWidget = new QWidget(this);
-    burgerWidget->setObjectName(BurgerMenuName);
+    burgerWidget->setObjectName(ObjectNames::BurgerMenu);
     auto burgerLay = new QHBoxLayout();
     burgerLay->setContentsMargins(0, 0, 0, 0);
     burgerLay->setSpacing(0);
@@ -167,8 +175,7 @@ void BurgerMenu::setIconSize(const QSize& size)
 
     mBurgerButton->setIconSize(size);
     mBurgerButton->setFixedSize(size);
-    auto buttons = findChildren<BurgerButton*>(BurgerButtonObjectName);
-    for(auto btn : buttons)
+    for(auto btn : std::as_const(mActionButtons))
         btn->setIconSize(size);
 
     if(mBurgerButton->isChecked())
@@ -218,17 +225,21 @@ void BurgerMenu::setExpansionState(bool expanded)
 void BurgerMenu::registerAction(QAction* action)
 {
     auto button = new BurgerButton(action, this);
+    button->setObjectName(ObjectNames::BurgerButton);
     button->setIconSize(mBurgerButton->iconSize());
     auto lay = static_cast<QVBoxLayout*>(layout());
     lay->insertWidget(lay->count() - 1, button);
+    mActionButtons << button;
 }
 
 void BurgerMenu::unRegisterAction(QAction* action)
 {
-    auto buttons = findChildren<BurgerButton*>(BurgerButtonObjectName);
-    auto btn = std::find_if(buttons.begin(), buttons.end(), [&](BurgerButton* btn){ return btn->action() == action; });
-    if(btn != buttons.end())
+    auto btn = std::find_if(mActionButtons.begin(), mActionButtons.end(), [&](BurgerButton* btn){ return btn->action() == action; });
+    if(btn != mActionButtons.end())
+    {
         delete *btn;
+        mActionButtons.erase(btn);
+    }
 }
 
 bool BurgerMenu::animated() const

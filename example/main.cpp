@@ -38,12 +38,12 @@ int main(int argc, char *argv[])
                          "#MainBurgerButton:hover     { background-color: #333;    } "
                         );
 
-    QObject::connect(menu, &BurgerMenu::triggered, [&](QAction* action)
+    QObject::connect(menu, &BurgerMenu::triggered, textEdit, [&](QAction* action)
     {
         textEdit->setText(QString("Action \"%1\" clicked.").arg(action->iconText()));
     });
 
-    QObject::connect(menu, &BurgerMenu::expandedChanged, [&](bool expanded)
+    QObject::connect(menu, &BurgerMenu::expandedChanged, textEdit, [&](bool expanded)
     {
         textEdit->setText(QString("Expanded changed: %1").arg(expanded ? "expanded" : "collapsed"));
     });

@@ -8,6 +8,7 @@ class QPushButton;
 class QActionGroup;
 class QAction;
 class QString;
+class BurgerButton;
 
 class BurgerMenu : public QWidget
 {
@@ -29,12 +30,12 @@ public:
     bool expanded() const;
 
 signals:
-    void iconChanged() const;
-    void iconSizeChanged(const QSize& size) const;
-    void menuWidthChanged(int width) const;
-    void animatedChanged(bool animated) const;
-    void expandedChanged(bool expanded) const;
-    void triggered(QAction* action) const;
+    void iconChanged();
+    void iconSizeChanged(const QSize& size);
+    void menuWidthChanged(int width);
+    void animatedChanged(bool animated);
+    void expandedChanged(bool expanded);
+    void triggered(QAction* action);
 
 public slots:
     QAction* addMenuAction(QAction* action);
@@ -58,6 +59,7 @@ private:
 
     QActionGroup* mActions;
     QPushButton*  mBurgerButton;
+    QList<BurgerButton*> mActionButtons;
     int           mMenuWidth;
     bool          mAnimated;
 };

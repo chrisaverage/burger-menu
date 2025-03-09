@@ -3,11 +3,72 @@
 #include <QList>
 #include <QSize>
 #include <QIcon>
+#include <QPushButton>
+#include <QPainter>
+#include <QStyleOptionButton>
+#include <QStyle>
 
-class QPushButton;
 class QActionGroup;
 class QAction;
 class QString;
+
+extern const QString BurgerButtonObjectName;
+extern const QString BurgerMenuName;
+extern const QString MainBurgerButtonObjectName;
+
+class BurgerButton : public QPushButton
+{
+    Q_OBJECT
+public:
+    BurgerButton(QAction* action, QWidget* parent)
+        : QPushButton(parent)
+        , mIconSize(QSize(64,64))
+        , mAction(action)
+    {
+        setObjectName(BurgerButtonObjectName);
+        connect(action, &QAction::destroyed, this, &BurgerButton::deleteLater);
+        setCursor(Qt::PointingHandCursor);
+
+        connect(mAction, SIGNAL(changed()), this, SLOT(update()));
+        connect(this, &BurgerButton::clicked, [&]{
+            if(mAction->isCheckable() && !mAction->isChecked())
+                mAction->toggle();
+
+            mAction->trigger();
+        });
+    }
+
+    void paintEvent(QPaintEvent*) override
+    {
+        QPainter painter(this);
+        QStyleOptionButton opt;
+        opt.initFrom(this);
+        opt.state |= (mAction->isChecked() ? QStyle::State_On : QStyle::State_Off);
+
+        style()->drawPrimitive(QStyle::PE_Widget, &opt, &painter, this);
+        const QRect contentsRect = style()->subElementRect(QStyle::SE_PushButtonContents, &opt, this);
+        if(!mAction->icon().isNull())
+        {
+            QIcon::Mode mode = ((opt.state & QStyle::State_MouseOver) == 0) ? QIcon::Normal : QIcon::Active;
+            if(!isEnabled())
+                mode = QIcon::Disabled;
+            QIcon::State state = mAction->isChecked() ? QIcon::On : QIcon::Off;
+            painter.drawPixmap(QRect(contentsRect.topLeft(), mIconSize), mAction->icon().pixmap(mIconSize, mode, state));
+        }
+
+        opt.rect = contentsRect.adjusted(mIconSize.width()+1, 0, 0, 0);
+        opt.text = fontMetrics().elidedText(mAction->iconText(), Qt::ElideRight, opt.rect.width(), Qt::TextShowMnemonic);
+        style()->drawControl(QStyle::CE_CheckBoxLabel, &opt, &painter, this);
+    }
+
+    void setIconSize(const QSize& size) { mIconSize = size; setFixedHeight(mIconSize.height()); update(); }
+
+    QAction* action() const { return mAction; }
+
+private:
+    QSize mIconSize;
+    QAction* mAction;
+};
 
 class BurgerMenu : public QWidget
 {

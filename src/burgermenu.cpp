@@ -1,12 +1,7 @@
 #include "burgermenu.h"
-#include <QStackedWidget>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QPushButton>
-#include <QAction>
-#include <QString>
-#include <QStyleOption>
-#include <QPainter>
 #include <QPropertyAnimation>
 #include <QActionGroup>
 
